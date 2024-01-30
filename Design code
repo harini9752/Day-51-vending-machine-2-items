@@ -1,0 +1,53 @@
+module vending_machine_2_items (
+  input wire clk,
+  input wire [0:0] selection,
+  input wire [3:0] inserted_amount,
+  output reg item_dispensed
+);
+
+  // Item prices
+  parameter PRICE_A = 3; // Price for item A
+  parameter PRICE_B = 5; // Price for item B
+
+  // Internal signals
+  reg [3:0] item_price; // Price of the selected item
+  reg [3:0] remaining_amount; // Remaining amount after selection
+  reg [1:0] state; // Vending machine state
+
+  // State machine definition
+  localparam IDLE = 2'b00; // Idle state
+  localparam SELECT_ITEM = 2'b01; // Selecting item state
+  localparam DISPENSE_ITEM = 2'b10; // Dispensing item state
+
+  always @(posedge clk) begin
+    case (state)
+      IDLE: begin
+        // Idle state: wait for item selection
+        item_dispensed = 0;
+        if (selection != 1'b0) begin
+          item_price <= (selection == 1'b1) ? PRICE_A : PRICE_B;
+          remaining_amount <= inserted_amount;
+          state <= SELECT_ITEM;
+        end
+      end
+
+      SELECT_ITEM: begin
+        // Selecting item state: check if enough amount is inserted
+        if (remaining_amount >= item_price) begin
+          remaining_amount <= remaining_amount - item_price;
+          state <= DISPENSE_ITEM;
+        end else begin
+          item_dispensed = 0;
+          state <= IDLE;
+        end
+      end
+
+      DISPENSE_ITEM: begin
+        // Dispensing item state: dispense item and go back to idle state
+        item_dispensed = 1;
+        state <= IDLE;
+      end
+    endcase
+  end
+
+endmodule
