@@ -1,0 +1,43 @@
+module tb_vending_machine_2_items;
+
+  reg clk;
+  reg [0:0] selection;
+  reg [3:0] inserted_amount;
+  wire item_dispensed;
+
+  vending_machine_2_items uut (
+    .clk(clk),
+    .selection(selection),
+    .inserted_amount(inserted_amount),
+    .item_dispensed(item_dispensed)
+  );
+
+  initial begin
+    // Initialize test
+    clk = 0;
+    selection = 1'b0;
+    inserted_amount = 0;
+
+    // Test 1: Select item A with exact amount
+    #10 inserted_amount = 3;
+    selection = 1'b1;
+    #10 $display("Time=%0t Selection=%b InsertedAmount=%d ItemDispensed=%b", $time, selection, inserted_amount, item_dispensed);
+
+    // Test 2: Select item B with insufficient amount
+    inserted_amount = 4;
+    selection = 1'b0;
+    #10 $display("Time=%0t Selection=%b InsertedAmount=%d ItemDispensed=%b", $time, selection, inserted_amount, item_dispensed);
+
+    // Test 3: Select item A with exact amount
+    inserted_amount = 3;
+    selection = 1'b1;
+    #10 $display("Time=%0t Selection=%b InsertedAmount=%d ItemDispensed=%b", $time, selection, inserted_amount, item_dispensed);
+
+    // Add more test cases as needed
+
+    $finish;
+  end
+
+  always #5 clk = ~clk;
+
+endmodule
